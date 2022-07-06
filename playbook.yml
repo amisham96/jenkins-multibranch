@@ -1,0 +1,70 @@
+---
+#ansy playbook start with three dash
+-
+###this minus in yaml indicate a list of items. the play contains a list of play
+  hosts: [node]
+    
+  tasks:
+    - name: Install Open Jdk
+      apt: 
+        name: openjdk-11-jdk-headless
+    - name: Install Maven
+      apt:
+        name: maven
+
+    - name: Create a Tomcat User
+      user:
+        name: tomcat
+
+    - name: Create a Tomcat group
+      group:
+        name: tomcat
+
+    - name: Configuring a Tomcat directory
+      file:
+        path: /opt/tomcat9
+        owner: tomcat
+        group: tomcat
+        mode: 755
+        recurse: yes
+
+    - name: Download tomcat package
+      get_url: 
+        url: https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.64/bin/apache-tomcat-9.0.64.tar.gz
+        dest: /opt/tomcat9
+        remote_src: yes
+
+    - name: Extract tomcat packages
+      unarchive: 
+        src: /opt/tomcat9/apache-tomcat-9.0.64.tar.gz
+        dest: /opt/tomcat9/
+        remote_src: yes
+ 
+    - name: Changing ownership of tomcat directory
+      file:
+        path: /opt/tomcat9
+        owner: tomcat
+        group: tomcat
+        mode: "u+rwx,g+rx,o+rx"
+        recurse: yes
+        state: directory
+ 
+    - name: Copy tomcat.service file
+      template:
+        src: templates/tomcat.service.j2
+        dest: /etc/systemd/system/tomcat.service
+
+    - name: Start and enable tomcat
+      service:
+        daemon_reload: yes
+        name: tomcat
+        state: started
+        enabled: yes
+      when: ansible_service_mgr == "systemd"
+
+    - name: Clone git repository
+      git:
+        repo: https://github.com/gopal1409/springboot-chat-app.git
+        dest: /root/spring-chatapp
+    - name: Run Maven build
+      include: maven-build.yml

@@ -1,0 +1,39 @@
+---
+#ansy playbook start with three dash
+#-
+###this minus in yaml indicate a list of items. the play contains a list of playbook
+    - name: download maven package 
+      get_url:
+        url: https://dlcdn.apache.org/maven/maven-3/3.8.6/binaries/apache-maven-3.8.6-bin.tar.gz
+        dest: /opt
+    - name: untar the maven package
+      ansible.builtin.unarchive:
+        src: /opt/apache-maven-3.8.6-bin.tar.gz
+        dest: /opt/
+        remote_src: yes
+    - name: symbolic link for apache maven
+      file: 
+        src: /opt/apache-maven-3.8.6
+        dest: /opt/maven
+        state: link
+    - name: create maven.sh
+      ansible.builtin.file:
+        path: /etc/profile.d/maven.sh
+        state: touch
+        mode: u+rwx,g+rwx,o+rwx
+    - name: Update maven.sh
+      lineinfile:
+        path: /etc/profile.d/maven.sh
+        state: present
+        line: "{{ item }}"
+      with_items:
+      - 'export M2_HOME=/opt/maven'
+      - 'export PATH=${M2_HOME}/bin:${PATH}'
+    - name: reload the profile 
+      shell: "source /etc/profile.d/maven.sh && echo $variable_in_profile"
+    - name: print maven version
+      shell: mvn --version
+      register: system_maven
+    - name: display maven version 
+      debug:
+        msg: "{{ system_maven }}"

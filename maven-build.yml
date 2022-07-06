@@ -1,0 +1,8 @@
+---
+#ansy playbook start with three dash
+#-
+###this minus in yaml indicate a list of items. the play contains a list of playbook
+    - name: Run Maven Build
+      command: mvn -f /root/spring-chatapp/ clean package
+    - name: Deploy Jar to tomcat
+      shell: cp /root/spring-chatapp/target/ROOT.jar /opt/tomcat9/apache-tomcat-9.0.64/webapps/
