@@ -1,4 +1,4 @@
-peline {
+pipeline {
     agent any 
     environment{
         imageName = '20.232.19.3:8085/candyshopapp'
