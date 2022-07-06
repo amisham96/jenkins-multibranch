@@ -37,11 +37,6 @@ pipeline {
                 // bat "mvn -Dmaven.test.failure.ignore=true clean package"
             } 
         }
-        stage("Deploy war to tomcat"){
-            steps{
-                sh "scp /var/lib/jenkins/workspace/ansible-tomcat-pipeline/target/*.jar root@ansjenkinsnode:/opt/tomcat9/apache-tomcat-9.0.64/webapps"
-            }
-        }
 
     }
 }
