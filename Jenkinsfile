@@ -83,5 +83,23 @@ pipeline {
         )
         }
      }
+     stage('Building image of the project'){
+        steps{
+            echo 'Starting to build docker image'
+            script{
+                dockerImage = docker.build imageName + ":$BUILD_NUMBER"
+            }
+        }
+     }
+     stage('Deploy Image to Nexus Repository'){
+         steps{
+            //  sh 'docker login -u admin -p Amit@1996 20.232.19.3:8085'
+             script{
+                 withDockerRegistry(credentialsId: 'nexus-cred', url: 'http://20.232.19.3:8085') {
+                     dockerImage.push()
+                 }
+             }
+         }
+     }
     }
 }
