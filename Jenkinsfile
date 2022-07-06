@@ -1,4 +1,4 @@
-peline {
+pipeline {
     agent any
 
     tools {
@@ -24,7 +24,7 @@ peline {
                 // failed, record the test results and archive the jar file.
                 success {
                     junit '**/target/surefire-reports/*.xml'
-                    archiveArtifacts 'target/*.war'
+                    archiveArtifacts 'target/*.jar'
                 }
             }
         }
@@ -39,7 +39,7 @@ peline {
         }
         stage("Deploy war to tomcat"){
             steps{
-                sh "scp /var/lib/jenkins/workspace/ansible-tomcat-pipeline/target/*.war root@ansjenkinsnode:/opt/tomcat9/apache-tomcat-9.0.64/webapps"
+                sh "scp /var/lib/jenkins/workspace/ansible-tomcat-pipeline/target/*.jar root@ansjenkinsnode:/opt/tomcat9/apache-tomcat-9.0.64/webapps"
             }
         }
 
