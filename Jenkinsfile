@@ -24,7 +24,7 @@ pipeline {
                 //if maven build was able to run the test we will create a test report and archive the jar in local machine
                 success {
                     junit '**/target/surefire-reports/*.xml'
-                    archiveArtifacts 'target/*.war'
+                    archiveArtifacts 'target/*.jar'
                 }
             }
         }
@@ -77,8 +77,8 @@ pipeline {
           artifacts: [
             [artifactId: 'candyshopapp',
              classifier: '',
-             file: 'target/candyshop-0.0.1-SNAPSHOT.war',
-             type: 'war']
+             file: 'target/candyshop-0.0.1-SNAPSHOT.jar',
+             type: 'jar']
         ]
         )
         }
