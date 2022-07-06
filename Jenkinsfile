@@ -77,8 +77,8 @@ pipeline {
           artifacts: [
             [artifactId: 'candyshopapp',
              classifier: '',
-             file: 'target/candyshop-0.0.1-SNAPSHOT.jar',
-             type: 'jar']
+             file: 'target/candyshop-0.0.1-SNAPSHOT.war',
+             type: 'war']
         ]
         )
         }
