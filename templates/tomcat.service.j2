@@ -1,0 +1,20 @@
+[Unit]
+Description=Tomcat
+After=network.target
+
+[Service]
+Type=forking
+
+User=tomcat
+Group=tomcat
+
+Environment=JAVA_HOME=/usr/lib/jvm/java-1.11.0-openjdk-amd64
+Environment=CATALINA_HOME=/opt/tomcat9/apache-tomcat-9.0.64
+Environment=CATALINA_BASE=/opt/tomcat9/apache-tomcat-9.0.64
+Environment=CATALINA_PID=/opt/tomcat9/apache-tomcat-9.0.64/temp/tomcat.pid
+
+ExecStart=/opt/tomcat9/apache-tomcat-9.0.64/bin/startup.sh
+ExecStop=/opt/tomcat9/apache-tomcat-9.0.64/bin/shutdown.sh
+
+[Install]
+	WantedBy=multi-user.target
