@@ -61,10 +61,3 @@
         state: started
         enabled: yes
       when: ansible_service_mgr == "systemd"
-
-    - name: Clone git repository
-      git:
-        repo: https://github.com/gopal1409/springboot-chat-app.git
-        dest: /root/spring-chatapp
-    - name: Run Maven build
-      include: maven-build.yml
