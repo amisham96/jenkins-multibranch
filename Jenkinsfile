@@ -1,87 +1,47 @@
-pipeline {
-    agent any 
-    environment{
-        imageName = '20.232.19.3:8085/candyshopapp'
-        dockerImage = ''
-    }
-    // agent is where my pipeline will be eexecuted
+peline {
+    agent any
+
     tools {
-        //install the maven version configured as m2 and add it to the path
+        // Install the Maven version configured as "M3" and add it to the path.
         maven "maven"
     }
+
     stages {
-        stage('Pull From SCM') {
+        stage('Build') {
             steps {
-            
-            git branch: 'ansible', url: 'https://github.com/amisham96/jenkins-multibranch.git'
+                // Get some code from a GitHub repository
+             git branch: 'ansible', url: 'https://github.com/amisham96/jenkins-multibranch.git'
+
+                // Run Maven on a Unix agent.
+                sh "mvn clean package"
+
+                // To run Maven on a Windows agent, use
+                // bat "mvn -Dmaven.test.failure.ignore=true clean package"
             }
-        }
-        stage('Run Maven Build') {
-            steps {
-            sh "mvn clean package"
-            }
+
             post {
-                //if maven build was able to run the test we will create a test report and archive the jar in local machine
+                // If Maven was able to run the tests, even if some of the test
+                // failed, record the test results and archive the jar file.
                 success {
                     junit '**/target/surefire-reports/*.xml'
                     archiveArtifacts 'target/*.war'
                 }
             }
         }
-        stage('Checkstyle') {
-            steps {
-                sh 'mvn checkstyle:checkstyle'
-            }
+        stage('ansible deploy') {
+           steps {
+                // Get some code from a GitHub repository
+                ansiblePlaybook credentialsId: 'ansible-cred', disableHostKeyChecking: true, inventory: 'dev.inv', playbook: 'playbook.yml'
+
+                // To run Maven on a Windows agent, use
+                // bat "mvn -Dmaven.test.failure.ignore=true clean package"
+            } 
         }
-        stage('Checkstyle Report') {
-            steps {
-                recordIssues(tools: [checkStyle(pattern: 'target/checkstyle-result.xml')])
-            }
-        }
-        stage('Code Coverage') {
-            steps {
-                jacoco()
-            }
-        }
-        stage('SonarQube Analysis'){
+        stage("Deploy war to tomcat"){
             steps{
-                dir("/var/lib/jenkins/workspace/static-code-analysis"){
-                withSonarQubeEnv('sonarqube'){
-                    sh 'mvn clean verify sonar:sonar -Dsonar.projectKey=candyshopapp -Dsonar.host.url=http://52.255.184.246:9000 -Dsonar.login=sqa_13948fa3dc8e6a0a9cbe053c03ed15558ca2f3b6'
-                }
-                }
+                sh "scp /var/lib/jenkins/workspace/ansible-tomcat-pipeline/target/*.war root@ansjenkinsnode:/opt/tomcat9/apache-tomcat-9.0.64/webapps"
             }
         }
-        stage("Quality Gate"){
-            steps{
-                script{
-                timeout(time: 1, unit: 'HOURS') { // Just in case something goes wrong, pipeline will be killed after a timeout
-                def qg = waitForQualityGate() // Reuse taskId previously collected by withSonarQubeEnv
-                if (qg.status != 'OK') {
-                    error "Pipeline aborted due to quality gate failure: ${qg.status}"
-                }
-                }
-            }
-            }
-        }
-        stage ('Upload jar to Nexus repository'){
-          steps {
-          nexusArtifactUploader(
-          nexusVersion: 'nexus3',
-          protocol: 'http',
-          nexusUrl: '20.232.19.3:8081',
-          groupId: 'candyshopapp',
-          version: '0.0.1-SNAPSHOT',
-          repository: 'maven-snapshots',
-          credentialsId: 'nexus-cred',
-          artifacts: [
-            [artifactId: 'candyshopapp',
-             classifier: '',
-             file: 'target/candyshop-0.0.1-SNAPSHOT.war',
-             type: 'war']
-        ]
-        )
-        }
-     }
+
     }
 }
