@@ -24,7 +24,7 @@ peline {
                 //if maven build was able to run the test we will create a test report and archive the jar in local machine
                 success {
                     junit '**/target/surefire-reports/*.xml'
-                    archiveArtifacts 'target/*.war'
+                    archiveArtifacts 'target/*.jar'
                 }
             }
         }
