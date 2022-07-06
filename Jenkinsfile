@@ -13,7 +13,7 @@ pipeline {
         stage('Pull From SCM') {
             steps {
             
-            git branch: 'master', url: 'https://github.com/amisham96/RestApi_Spring_JPA.git'
+            git branch: 'ansible', url: 'https://github.com/amisham96/jenkins-multibranch.git'
             }
         }
         stage('Run Maven Build') {
